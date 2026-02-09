@@ -1,18 +1,22 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, String, Date, Enum, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from datetime import datetime
-from .database import Base
+import enum
+
+from app.database import Base
+
+
+class AttendanceStatus(str, enum.Enum):
+    PRESENT = "Present"
+    ABSENT = "Absent"
 
 
 class Employee(Base):
     __tablename__ = "employees"
 
-    id = Column(Integer, primary_key=True, index=True)
-    emp_id = Column(String, unique=True, nullable=False, index=True)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=False)
+    employee_id = Column(String, primary_key=True, index=True)
+    full_name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False, index=True)
     department = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
 
     attendance_records = relationship(
         "Attendance", back_populates="employee", cascade="all, delete-orphan"
@@ -22,9 +26,9 @@ class Employee(Base):
 class Attendance(Base):
     __tablename__ = "attendance"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     employee_id = Column(
-        Integer, ForeignKey("employees.id", ondelete="CASCADE"), nullable=False
+        String, ForeignKey("employees.employee_id", ondelete="CASCADE"), nullable=False
     )
     date = Column(Date, nullable=False)
     status = Column(String, nullable=False)

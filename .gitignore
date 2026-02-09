@@ -1,15 +1,14 @@
-# Dependencies
-node_modules/
-venv/
+# Python
 __pycache__/
-*.pyc
-
-# DB (will be created at runtime)
-data/hrms.db
-
-# Environment
+*.py[cod]
+*.db
+venv/
+.venv/
 .env
-.env.local
+
+# Node
+node_modules/
+dist/
 
 # IDE
 .vscode/

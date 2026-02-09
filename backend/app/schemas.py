@@ -1,76 +1,84 @@
 from pydantic import BaseModel, EmailStr, field_validator
-from datetime import date, datetime
+from datetime import date
+from typing import Optional, Literal
 
 
 class EmployeeCreate(BaseModel):
-    emp_id: str
-    name: str
+    employee_id: str
+    full_name: str
     email: EmailStr
     department: str
 
-    @field_validator("emp_id", "name", "department")
+    @field_validator("employee_id")
     @classmethod
-    def not_empty(cls, v, info):
-        if not v or not v.strip():
-            raise ValueError(f"{info.field_name} cannot be empty")
-        return v.strip()
+    def employee_id_not_empty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Employee ID is required")
+        if len(v) > 50:
+            raise ValueError("Employee ID must be 50 characters or less")
+        return v
 
-    @field_validator("email")
+    @field_validator("full_name")
     @classmethod
-    def email_not_empty(cls, v):
-        if not v or not v.strip():
-            raise ValueError("email cannot be empty")
-        return v.strip().lower()
+    def full_name_not_empty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Full name is required")
+        if len(v) > 100:
+            raise ValueError("Full name must be 100 characters or less")
+        return v
+
+    @field_validator("department")
+    @classmethod
+    def department_not_empty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Department is required")
+        if len(v) > 100:
+            raise ValueError("Department must be 100 characters or less")
+        return v
 
 
 class EmployeeResponse(BaseModel):
-    id: int
-    emp_id: str
-    name: str
+    employee_id: str
+    full_name: str
     email: str
     department: str
-    created_at: datetime
-    present_days: int = 0
-    total_days: int = 0
+    total_present: int = 0
+    total_absent: int = 0
 
     class Config:
         from_attributes = True
 
 
 class AttendanceCreate(BaseModel):
-    emp_id: str
+    employee_id: str
     date: date
-    status: str
+    status: Literal["Present", "Absent"]
 
-    @field_validator("status")
+    @field_validator("employee_id")
     @classmethod
-    def validate_status(cls, v):
-        if v not in ("Present", "Absent"):
-            raise ValueError('Status must be "Present" or "Absent"')
+    def employee_id_not_empty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Employee ID is required")
         return v
-
-    @field_validator("emp_id")
-    @classmethod
-    def emp_id_not_empty(cls, v):
-        if not v or not v.strip():
-            raise ValueError("emp_id cannot be empty")
-        return v.strip()
 
 
 class AttendanceResponse(BaseModel):
-    id: int
+    id: str
+    employee_id: str
     date: date
     status: str
-    employee_id: int
-    emp_id: str
-    employee_name: str
+    employee_name: Optional[str] = None
 
     class Config:
         from_attributes = True
 
 
-class DashboardStats(BaseModel):
+class DashboardResponse(BaseModel):
     total_employees: int
-    present_today: int
-    absent_today: int
-    attendance_rate: int
+    total_present_today: int
+    total_absent_today: int
+    department_count: int

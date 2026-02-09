@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.pyc
+
+# DB (will be created at runtime)
+data/hrms.db
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
